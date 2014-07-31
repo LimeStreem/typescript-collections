@@ -59,7 +59,7 @@ module collections {
      * Default function to convert an object to a string.
      * @function     
      */
-    export function defaultToString(item: any): string {
+    export function defaultToString(item): string {
         if (item === null) {
             return 'COLLECTION_NULL';
         } else if (collections.isUndefined(item)) {
@@ -74,7 +74,7 @@ module collections {
     /**
     * Joins all the properies of the object using the provided join string 
     */
-    export function makeString<T>(item: T, join: string = ","): string {
+    export function toString<T>(item: T, join: string = ","): string {
         if (item === null) {
             return 'COLLECTION_NULL';
         } else if (collections.isUndefined(item)) {
@@ -101,7 +101,7 @@ module collections {
      * Checks if the given argument is a function.
      * @function     
      */
-    export function isFunction(func: any): boolean {
+    export function isFunction(func): boolean {
         return (typeof func) === 'function';
     }
 
@@ -109,7 +109,7 @@ module collections {
      * Checks if the given argument is undefined.
      * @function
      */
-    export function isUndefined(obj: any): boolean {
+    export function isUndefined(obj): boolean {
         return (typeof obj) === 'undefined';
     }
 
@@ -117,7 +117,7 @@ module collections {
      * Checks if the given argument is a string.
      * @function
      */
-    export function isString(obj: any): boolean {
+    export function isString(obj): boolean {
         return Object.prototype.toString.call(obj) === '[object String]';
     }
 
@@ -523,8 +523,8 @@ module collections {
             if (this.nElements < 1 || collections.isUndefined(item)) {
                 return false;
             }
-            var previous: ILinkedListNode<T> = null;
-            var currentNode: ILinkedListNode<T> = this.firstNode;
+            var previous = null;
+            var currentNode = this.firstNode;
 
             while (currentNode !== null) {
                 if (equalsF(currentNode.element, item)) {
@@ -604,7 +604,7 @@ module collections {
             if (index < 0 || index >= this.nElements) {
                 return undefined;
             }
-            var element: T;
+            var element;
             if (this.nElements === 1) {
                 //First node in the list.
                 element = this.firstNode.element;
@@ -649,9 +649,9 @@ module collections {
          * element first, and the first element last).
          */
         reverse(): void {
-            var previous: ILinkedListNode<T> = null;
-            var current: ILinkedListNode<T> = this.firstNode;
-            var temp: ILinkedListNode<T> = null;
+            var previous = null;
+            var current = this.firstNode;
+            var temp = null;
             while (current !== null) {
                 temp = current.next;
                 current.next = previous;
@@ -702,7 +702,7 @@ module collections {
         /**
          * @private
          */
-        private nodeAtIndex(index: number): ILinkedListNode<T> {
+        private nodeAtIndex(index): ILinkedListNode<T> {
 
             if (index < 0 || index >= this.nElements) {
                 return null;
@@ -731,7 +731,7 @@ module collections {
 
 
     // Used internally by dictionary 
-    interface IDictionaryPair<K, V>{
+    interface IDicitonaryPair<K, V>{
         key: K;
         value: V;
     }
@@ -743,7 +743,7 @@ module collections {
          * @type {Object}
          * @private
          */
-        private table: { [key: string]: IDictionaryPair<K, V> };
+        private table: { [key: string]: IDicitonaryPair<K, V> };
         //: [key: K] will not work since indices can only by strings in javascript and typescript enforces this. 
 
         /**
@@ -794,7 +794,7 @@ module collections {
          * undefined if the map contains no mapping for this key.
          */
         getValue(key: K): V {
-            var pair: IDictionaryPair<K, V> = this.table[this.toStr(key)];
+            var pair: IDicitonaryPair<K, V> = this.table[this.toStr(key)];
             if (collections.isUndefined(pair)) {
                 return undefined;
             }
@@ -818,9 +818,9 @@ module collections {
                 return undefined;
             }
 
-            var ret: V;
+            var ret;
             var k = this.toStr(key);
-            var previousElement: IDictionaryPair<K, V> = this.table[k];
+            var previousElement: IDicitonaryPair<K, V> = this.table[k];
             if (collections.isUndefined(previousElement)) {
                 this.nElements++;
                 ret = undefined;
@@ -843,7 +843,7 @@ module collections {
          */
         remove(key: K): V {
             var k = this.toStr(key);
-            var previousElement: IDictionaryPair<K, V> = this.table[k];
+            var previousElement: IDicitonaryPair<K, V> = this.table[k];
             if (!collections.isUndefined(previousElement)) {
                 delete this.table[k];
                 this.nElements--;
@@ -860,7 +860,7 @@ module collections {
             var array: K[] = [];
             for (var name in this.table) {
                 if (this.table.hasOwnProperty(name)) {
-                    var pair: IDictionaryPair<K, V> = this.table[name];
+                    var pair: IDicitonaryPair<K, V> = this.table[name];
                     array.push(pair.key);
                 }
             }
@@ -875,7 +875,7 @@ module collections {
             var array: V[] = [];
             for (var name in this.table) {
                 if (this.table.hasOwnProperty(name)) {
-                    var pair: IDictionaryPair<K, V> = this.table[name];
+                    var pair: IDicitonaryPair<K, V> = this.table[name];
                     array.push(pair.value);
                 }
             }
@@ -892,7 +892,7 @@ module collections {
         forEach(callback: (key: K, value: V) => any): void {
             for (var name in this.table) {
                 if (this.table.hasOwnProperty(name)) {
-                    var pair: IDictionaryPair<K, V> = this.table[name];
+                    var pair: IDicitonaryPair<K, V> = this.table[name];
                     var ret = callback(pair.key, pair.value);
                     if (ret === false) {
                         return;
@@ -977,42 +977,40 @@ module collections {
         private dict: Dictionary<K, Array<V>>;
         private equalsF: IEqualsFunction<V>;
         private allowDuplicate: boolean;
-
-      /**
-       * Creates an empty multi dictionary.
-       * @class <p>A multi dictionary is a special kind of dictionary that holds
-       * multiple values against each key. Setting a value into the dictionary will
-       * add the value to an array at that key. Getting a key will return an array,
-       * holding all the values set to that key.
-       * You can configure to allow duplicates in the values.
-       * This implementation accepts any kind of objects as keys.</p>
-       *
-       * <p>If the keys are custom objects a function which converts keys to strings must be
-       * provided. Example:</p>
-       *
-       * <pre>
-       * function petToString(pet) {
+        /**
+         * Creates an empty multi dictionary. 
+         * @class <p>A multi dictionary is a special kind of dictionary that holds
+         * multiple values against each key. Setting a value into the dictionary will 
+         * add the value to an array at that key. Getting a key will return an array,
+         * holding all the values set to that key. 
+         * You can configure to allow duplicates in the values. 
+         * This implementation accepts any kind of objects as keys.</p>
+         *
+         * <p>If the keys are custom objects a function which converts keys to strings must be
+         * provided. Example:</p>
+         *
+         * <pre>
+         * function petToString(pet) {
          *  return pet.name;
          * }
-       * </pre>
-       * <p>If the values are custom objects a function to check equality between values
-       * must be provided. Example:</p>
-       *
-       * <pre>
-       * function petsAreEqualByAge(pet1,pet2) {
+         * </pre>
+         * <p>If the values are custom objects a function to check equality between values
+         * must be provided. Example:</p>
+         *
+         * <pre>
+         * function petsAreEqualByAge(pet1,pet2) {
          *  return pet1.age===pet2.age;
          * }
-       * </pre>
-       * @constructor
-       * @param {function(Object):string=} toStrFunction optional function
-       * to convert keys to strings. If the keys aren't strings or if toString()
-       * is not appropriate, a custom function which receives a key and returns a
-       * unique string must be provided.
-       * @param {function(Object,Object):boolean=} valuesEqualsFunction optional
-       * function to check if two values are equal.
-       *
-       * @param allowDuplicateValues
-       */
+         * </pre>
+         * @constructor
+         * @param {function(Object):string=} toStrFunction optional function
+         * to convert keys to strings. If the keys aren't strings or if toString()
+         * is not appropriate, a custom function which receives a key and returns a
+         * unique string must be provided.
+         * @param {function(Object,Object):boolean=} valuesEqualsFunction optional
+         * function to check if two values are equal.
+         * 
+         */
         constructor(toStrFunction?: (key: K) => string, valuesEqualsFunction?: IEqualsFunction<V>, allowDuplicateValues = false) {
             this.dict = new Dictionary<K, Array<V>>(toStrFunction);
             this.equalsF = valuesEqualsFunction || collections.defaultEquals;
@@ -1075,7 +1073,10 @@ module collections {
         remove(key: K, value?: V): boolean {
             if (collections.isUndefined(value)) {
                 var v = this.dict.remove(key);
-                return !collections.isUndefined(v);
+                if (collections.isUndefined(v)) {
+                    return false;
+                }
+                return true;
             }
             var array = this.dict.getValue(key);
             if (collections.arrays.remove(array, value, this.equalsF)) {
@@ -1101,7 +1102,7 @@ module collections {
          */
         values(): V[] {
             var values = this.dict.values();
-            var array:Array<V> = [];
+            var array = [];
             for (var i = 0; i < values.length; i++) {
                 var v = values[i];
                 for (var j = 0; j < v.length; j++) {
@@ -1126,7 +1127,7 @@ module collections {
          * Removes all mappings from this dictionary.
          */
         clear(): void {
-            this.dict.clear();
+            return this.dict.clear();
         }
 
         /**
@@ -1502,12 +1503,12 @@ module collections {
         /**
          * Creates an empty queue.
          * @class A queue is a First-In-First-Out (FIFO) data structure, the first
-         * element added to the queue will be the first one to be removed. This
+         * element added to the queues will be the first one to be removed. This
          * implementation uses a linked list as a container.
          * @constructor
          */
         constructor() {
-            this.list = new LinkedList<T>();
+            this.list = new LinkedList<T>();//fix for tsc 1.0(But,I'm not accustomed to use typescript.It might be wrong fix...) 2014/7/31 LimeStreem
         }
 
 
@@ -1794,7 +1795,7 @@ module collections {
                 if (!otherSet.contains(element)) {
                     set.remove(element);
                 }
-                return true;
+                return;
             });
         }
 
@@ -1807,7 +1808,7 @@ module collections {
             var set = this;
             otherSet.forEach(function (element: T): boolean {
                 set.add(element);
-                return true;
+                return;
             });
         }
 
@@ -1820,7 +1821,7 @@ module collections {
             var set = this;
             otherSet.forEach(function (element: T): boolean {
                 set.remove(element);
-                return true;
+                return;
             });
         }
 
@@ -1841,7 +1842,6 @@ module collections {
                     isSub = false;
                     return false;
                 }
-            return true;
             });
             return isSub;
         }
@@ -2031,7 +2031,7 @@ module collections {
          * @return {Array} an array containing all of the elements in this bag.
          */
         toArray(): T[] {
-            var a:Array<T> = [];
+            var a = [];
             var values = this.dictionary.values();
             var vl = values.length;
             for (var i = 0; i < vl; i++) {
@@ -2311,10 +2311,10 @@ module collections {
          * @return {Array} an array containing all of the elements in this tree in in-order.
          */
         toArray(): T[] {
-            var array: Array<T> = [];
+            var array = [];
             this.inorderTraversal(function (element: T): boolean {
                 array.push(element);
-                return true;
+                return;
             });
             return array;
         }
@@ -2331,7 +2331,7 @@ module collections {
         * @private
         */
         private searchNode(node: BSTreeNode<T>, element: T): BSTreeNode<T> {
-            var cmp:number = null;
+            var cmp = null;
             while (node !== null && cmp !== 0) {
                 cmp = this.compare(element, node.element);
                 if (cmp < 0) {
@@ -2402,7 +2402,7 @@ module collections {
         * @private
         */
         private levelTraversalAux(node: BSTreeNode<T>, callback: ILoopFunction<T>) {
-            var queue = new Queue<BSTreeNode<T>>();
+            var queue = new Queue<BSTreeNode<T>>();//fix for tsc 1.0(But,I'm not accustomed to use typescript.It might be wrong fix...) 2014/7/31 LimeStreem
             if (node !== null) {
                 queue.enqueue(node);
             }
@@ -2475,7 +2475,22 @@ module collections {
             return node;
         }
 
-      /**
+        /**
+        * @private
+        */
+        private successorNode(node: BSTreeNode<T>): BSTreeNode<T> {
+            if (node.rightCh !== null) {
+                return this.minimumAux(node.rightCh);
+            }
+            var successor = node.parent;
+            while (successor !== null && node === successor.rightCh) {
+                node = successor;
+                successor = node.parent;
+            }
+            return successor;
+        }
+
+        /**
         * @private
         */
         private heightAux(node: BSTreeNode<T>): number {
@@ -2490,9 +2505,9 @@ module collections {
         */
         private insertNode(node: BSTreeNode<T>): BSTreeNode<T> {
 
-            var parent: any = null;
+            var parent = null;
             var position = this.root;
-            var cmp:number = null;
+            var cmp = null;
             while (position !== null) {
                 cmp = this.compare(node.element, position.element);
                 if (cmp === 0) {

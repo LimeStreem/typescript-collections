@@ -1,4 +1,4 @@
-// Copyright 2013 Basarat Ali Syed. All Rights Reserved.
+﻿// Copyright 2013 Basarat Ali Syed. All Rights Reserved.
 //
 // Licensed under MIT open source license http://opensource.org/licenses/MIT
 //
@@ -58,7 +58,7 @@ var collections;
     /**
     * Joins all the properies of the object using the provided join string
     */
-    function makeString(item, join) {
+    function toString(item, join) {
         if (typeof join === "undefined") { join = ","; }
         if (item === null) {
             return 'COLLECTION_NULL';
@@ -81,7 +81,7 @@ var collections;
             return toret + "}";
         }
     }
-    collections.makeString = makeString;
+    collections.toString = toString;
 
     /**
     * Checks if the given argument is a function.
@@ -952,7 +952,6 @@ var collections;
         * @param {function(Object,Object):boolean=} valuesEqualsFunction optional
         * function to check if two values are equal.
         *
-        * @param allowDuplicateValues
         */
         function MultiDictionary(toStrFunction, valuesEqualsFunction, allowDuplicateValues) {
             if (typeof allowDuplicateValues === "undefined") { allowDuplicateValues = false; }
@@ -1016,7 +1015,10 @@ var collections;
         MultiDictionary.prototype.remove = function (key, value) {
             if (collections.isUndefined(value)) {
                 var v = this.dict.remove(key);
-                return !collections.isUndefined(v);
+                if (collections.isUndefined(v)) {
+                    return false;
+                }
+                return true;
             }
             var array = this.dict.getValue(key);
             if (collections.arrays.remove(array, value, this.equalsF)) {
@@ -1067,7 +1069,7 @@ var collections;
         * Removes all mappings from this dictionary.
         */
         MultiDictionary.prototype.clear = function () {
-            this.dict.clear();
+            return this.dict.clear();
         };
 
         /**
@@ -1434,12 +1436,12 @@ var collections;
         /**
         * Creates an empty queue.
         * @class A queue is a First-In-First-Out (FIFO) data structure, the first
-        * element added to the queue will be the first one to be removed. This
+        * element added to the queues will be the first one to be removed. This
         * implementation uses a linked list as a container.
         * @constructor
         */
         function Queue() {
-            this.list = new LinkedList();
+            this.list = new LinkedList(); //fix for tsc 1.0(But,I'm not accustomed to use typescript.It might be wrong fix...) 2014/7/31 LimeStreem
         }
         /**
         * Inserts the specified element into the end of this queue.
@@ -1716,7 +1718,7 @@ var collections;
                 if (!otherSet.contains(element)) {
                     set.remove(element);
                 }
-                return true;
+                return;
             });
         };
 
@@ -1729,7 +1731,7 @@ var collections;
             var set = this;
             otherSet.forEach(function (element) {
                 set.add(element);
-                return true;
+                return;
             });
         };
 
@@ -1742,7 +1744,7 @@ var collections;
             var set = this;
             otherSet.forEach(function (element) {
                 set.remove(element);
-                return true;
+                return;
             });
         };
 
@@ -1762,7 +1764,6 @@ var collections;
                     isSub = false;
                     return false;
                 }
-                return true;
             });
             return isSub;
         };
@@ -2219,7 +2220,7 @@ var collections;
             var array = [];
             this.inorderTraversal(function (element) {
                 array.push(element);
-                return true;
+                return;
             });
             return array;
         };
@@ -2384,6 +2385,21 @@ var collections;
         /**
         * @private
         */
+        BSTree.prototype.successorNode = function (node) {
+            if (node.rightCh !== null) {
+                return this.minimumAux(node.rightCh);
+            }
+            var successor = node.parent;
+            while (successor !== null && node === successor.rightCh) {
+                node = successor;
+                successor = node.parent;
+            }
+            return successor;
+        };
+
+        /**
+        * @private
+        */
         BSTree.prototype.heightAux = function (node) {
             if (node === null) {
                 return -1;
@@ -2437,3 +2453,4 @@ var collections;
     })();
     collections.BSTree = BSTree;
 })(collections || (collections = {})); // End of module
+//# sourceMappingURL=collections.js.map
